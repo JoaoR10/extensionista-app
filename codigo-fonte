@@ -1,0 +1,80 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+public class GeneticAlgorithm : MonoBehaviour
+{
+    public GameObject creaturePrefab;
+    public int populationSize = 10;
+    public Transform target;
+
+    private List<GameObject> population;
+
+    void Start()
+    {
+        InitializePopulation();
+    }
+
+    void Update()
+    {
+        EvaluatePopulation();
+        ReproducePopulation();
+    }
+
+    void InitializePopulation()
+    {
+        population = new List<GameObject>();
+
+        for (int i = 0; i < populationSize; i++)
+        {
+            GameObject creature = Instantiate(creaturePrefab, RandomPosition(), Quaternion.identity);
+            population.Add(creature);
+        }
+    }
+
+    void EvaluatePopulation()
+    {
+        foreach (GameObject creature in population)
+        {
+            float fitness = 1f / Vector3.Distance(creature.transform.position, target.position);
+            // Não há necessidade de fazer algo específico aqui, pois não há lógica detalhada fornecida
+        }
+    }
+
+    void ReproducePopulation()
+    {
+        population.Sort((a, b) =>
+            Vector3.Distance(b.transform.position, target.position)
+                .CompareTo(Vector3.Distance(a.transform.position, target.position)));
+
+        for (int i = populationSize / 2; i < populationSize; i++)
+        {
+            GameObject parentA = population[i];
+            GameObject parentB = population[i - populationSize / 2];
+
+            GameObject child = Instantiate(creaturePrefab, RandomPosition(), Quaternion.identity);
+
+            // A lógica de cruzamento não está especificada, mantive o código original para fins de exemplo
+            child.transform.position = MutatePosition(parentA.transform.position);
+
+            population[i - populationSize / 2] = child;
+        }
+    }
+
+    Vector3 RandomPosition()
+    {
+        float x = Random.Range(-5f, 5f);
+        float y = 0.5f;
+        float z = Random.Range(-5f, 5f);
+
+        return new Vector3(x, y, z);
+    }
+
+    Vector3 MutatePosition(Vector3 position)
+    {
+        float mutationRange = 0.1f;
+        float xOffset = Random.Range(-mutationRange, mutationRange);
+        float zOffset = Random.Range(-mutationRange, mutationRange);
+
+        return new Vector3(position.x + xOffset, position.y, position.z + zOffset);
+    }
+}
